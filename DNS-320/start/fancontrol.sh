@@ -18,10 +18,13 @@ status_cmd="fancontrol_status"
 
 LOGFILE=/var/log/fan.log
 
-logcommand()
-   { 
-   echo "`/bin/date '+%b %e %H:%M:%S'`:" $1 >> $LOGFILE
-   }
+# logcommand() {
+	# echo "`/bin/date +"%b %e %H:%M:%S"`:" $1 >> $LOGFILE
+	# }
+
+logcommand() {
+	logger $1
+}
 
 fancontrol_start() {
 	if [ ! -e /var/run/fancontrol.pid ] ; then
@@ -42,6 +45,7 @@ fancontrol_stop() {
 	rm /var/run/fancontrol.pid
 	rm /tmp/fancontrol.sh
 	mv /usr/sbin/ffff /usr/sbin/fan_control
+	#logcommand "Starting built-in fan_control"
 	fan_control >/dev/null 2>/dev/null &
 }
 	
@@ -53,9 +57,9 @@ fancontrol_restart() {
 
 fancontrol_status() {
 	if [ -e /var/run/fancontrol.pid ]; then
-		echo " Fancontrol daemon is running"
+		echo "Fancontrol daemon is running"
 	else
-		echo " Fancontrol daemon is not running"
+		echo "Fancontrol daemon is not running"
 	fi
 }
 
