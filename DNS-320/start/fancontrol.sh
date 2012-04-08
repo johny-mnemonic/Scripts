@@ -18,12 +18,9 @@ status_cmd="fancontrol_status"
 
 LOGFILE=/var/log/fan.log
 
-# logcommand() {
-	# echo "`/bin/date +"%b %e %H:%M:%S"`:" $1 >> $LOGFILE
-	# }
-
 logcommand() {
-	logger $1
+	logger "$1"
+	echo "`/bin/date +"%b %e %H:%M:%S"`:" $1 >> $LOGFILE
 }
 
 fancontrol_start() {

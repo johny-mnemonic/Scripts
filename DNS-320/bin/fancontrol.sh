@@ -73,8 +73,7 @@ logcommand "Current temperatures: Sys: "$ST"C, HDD1: "$Ta"C, HDD2: "$Tb"C"
 
 FAN=`fanspeed g`
 
-while /ffp/bin/true; do
-	/bin/sleep $PERIOD
+while /bin/true; do
 	disk1_temp
 	if [ $SECOND_HDD -eq "1" ]; then
         disk2_temp
@@ -107,4 +106,5 @@ while /ffp/bin/true; do
 		fi
 	fi
 	logtemperature $FAN $ST $Ta $Tb $OLD_FAN
+	/bin/sleep $PERIOD
 done
