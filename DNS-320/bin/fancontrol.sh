@@ -22,12 +22,9 @@ Hyst="2"
 SL=$((SysLow-Hyst))
 DL=$((HddLow-Hyst))
 
-# logcommand() {
-	# echo "`/bin/date +"%b %e %H:%M:%S"`:" $1 >> $LOGFILE
-	# }
-
 logcommand() {
-	logger $1
+	logger "$1"
+	echo "`/bin/date +"%b %e %H:%M:%S"`: $1" >> $LOGFILE
 }
 
 logtemperature() {
@@ -46,14 +43,14 @@ logtemperature() {
 }
 
 disk1_temp() {
-	if [ -s /tmp/hdd ]; then
+	if hdparm -C /dev/sda | grep -q standby ; then
 		Ta=-1
 	else
 		Ta=`smartctl -d marvell --all /dev/sda |grep -e ^194 | head -c 40 | tail -c 2`
 	fi
 }
 disk2_temp() {
-	if [ -s /tmp/hdd ]; then
+	 if hdparm -C /dev/sdb | grep -q standby ; then
 		Tb=-1
 	else
 		Tb=`smartctl -d marvell --all /dev/sdb |grep -e ^194 | head -c 40 | tail -c 2`
@@ -64,11 +61,15 @@ system_temp() {
 	ST=`FT_testing -T | tail -c 3 | head -c 2`
 }
 
-logcommand "  Starting DNS-320 Fancontrol script"
+logcommand "Starting DNS-320 Fancontrol script"
 disk1_temp
-disk2_temp
+if [ $SECOND_HDD -eq "1" ]; then
+	disk2_temp
+else
+	Tb="-1"
+fi
 system_temp
-logcommand "  Current temperatures: Sys: "$ST"°C, HDD1: "$Ta"°C, HDD2: "$Tb"°C "
+logcommand "Current temperatures: Sys: "$ST"C, HDD1: "$Ta"C, HDD2: "$Tb"C"
 
 FAN=`fanspeed g`
 
@@ -78,27 +79,27 @@ while /ffp/bin/true; do
 	if [ $SECOND_HDD -eq "1" ]; then
         disk2_temp
     else
-        Tb="0"
+        Tb="-1"
     fi
     OLD_FAN=$FAN
 	system_temp
 	if [ $ST -ge $SysHigh -o $Ta -ge $HddHigh -o $Tb -ge $HddHigh ]; then
 		if [ $FAN != high ]; then
-			logcommand "Running fan on high, temperature too high: Sys: "$ST"°C, HDD1: "$Ta"°C, HDD2: "$Tb"°C "
+			logcommand "Running fan on high, temperature too high: Sys: "$ST"C, HDD1: "$Ta"C, HDD2: "$Tb"C "
 			fanspeed h
 			FAN=high
 		fi
 	else
 		if [ $ST -ge $SysLow -o $Ta -ge $HddLow -o $Tb -ge $HddLow ]; then
 			if [ $FAN != low ]; then
-				logcommand "Running fan on low, temperature high: Sys: "$ST"°C, HDD1: "$Ta"°C, HDD2: "$Tb"°C "
+				logcommand "Running fan on low, temperature high: Sys: "$ST"C, HDD1: "$Ta"C, HDD2: "$Tb"C "
 				fanspeed l
 				FAN=low
 			fi
 		else
 			if [ $ST -le $SL -a $Ta -le $DL -a $Tb -le $DL ]; then
 				if [ $FAN != 'stop' ]; then
-					logcommand "Stopping fan, temperature low: Sys: "$ST"°C, HDD1: "$Ta"°C, HDD2: "$Tb"°C "
+					logcommand "Stopping fan, temperature low: Sys: "$ST"C, HDD1: "$Ta"C, HDD2: "$Tb"C "
 					fanspeed s >/dev/null 2>/dev/null &
 					FAN=stop
 				fi
