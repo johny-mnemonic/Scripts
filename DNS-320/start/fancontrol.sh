@@ -46,7 +46,7 @@ fancontrol_stop() {
 	rm /tmp/fancontrol.sh
 	mv /usr/sbin/ffff /usr/sbin/fan_control
 	#logcommand "Starting built-in fan_control"
-	fan_control >/dev/null 2>/dev/null &
+	fan_control 0 d >/dev/null 2>/dev/null &
 }
 	
 fancontrol_restart() {
