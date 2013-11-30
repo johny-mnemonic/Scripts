@@ -83,7 +83,6 @@ check_second_disk() {
 	SD=`mount | grep /dev/sdb | head -n 1`
 	if [[ ! -z "$SD" ]]; then
 		SECOND_HDD="1"
-		logcommand "Second disk detected"
 	else 
 		SECOND_HDD="0"
 	fi
