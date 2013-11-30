@@ -40,7 +40,7 @@ disk1_temp() {
 	if hdparm -C /dev/sda | grep -q standby ; then
 		Ta=-1
 	else
-		Ta=`smartctl -d marvell --all /dev/sda |grep -e ^194 | head -c 40 | tail -c 2`
+		Ta=`smartctl -d marvell --all /dev/sda |grep -e ^194 | awk '{print $10}'`
 	fi
 }
 
@@ -49,7 +49,7 @@ disk2_temp() {
 	 if hdparm -C /dev/sdb | grep -q standby ; then
 		Tb=-1
 	else
-		Tb=`smartctl -d marvell --all /dev/sdb |grep -e ^194 | head -c 40 | tail -c 2`
+		Tb=`smartctl -d marvell --all /dev/sdb |grep -e ^194 | awk '{print $10}'`
 	fi
 }
 
